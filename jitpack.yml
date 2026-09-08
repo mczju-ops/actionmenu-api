@@ -1,0 +1,6 @@
+# 与编译目标保持一致；仅构建公开 API，不需要主插件源码。
+before_install:
+  - sdk use java 25.0.2-tem || sdk install java 25.0.2-tem
+  - sdk use java 25.0.2-tem
+install:
+  - mvn -B -DskipTests clean install
