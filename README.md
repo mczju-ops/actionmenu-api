@@ -1,25 +1,12 @@
 # ActionMenu API
 
-ActionMenu 的公开 Paper 插件服务接口，用于由其他插件创建和批量修改服务器菜单。仓库只包含公开接口、数据类型和文档，独立构建，不依赖 ActionMenu 本体源码或父 POM。
+ActionMenu 的公开 Paper 插件服务接口，用于由其他插件创建和批量修改服务器菜单，或在提供有效菜单定义的情况下打开虚拟菜单。
 
-当前 API 版本为 `1.0.0`，与主插件版本独立。服务能力为查询、创建、批量修改、启停和打开菜单；本批不提供删除和次数重置。
-
-## 构建与发布
-
-- 使用 JDK 25，Paper API 依赖与 ActionMenu 当前目标版本一致。
-- 本地运行 `mvn clean install`，将 `com.github.mczju-ops:actionmenu-api:1.0.0` 安装到本机 Maven 仓库，输出 JAR 位于 `target/`。
-- API JAR 仅供编译依赖，不应安装到服务器 plugins 目录。ActionMenu 本体会将它合入自己的最终 JAR。
-- JitPack 只访问本公开仓库，不需要访问主插件仓库。仓库提供 `jitpack.yml`，通过 SDKMAN 选择 Temurin JDK 25 后执行 Maven install。
-- 首次发布时，由维护者提交代码、创建并推送 `1.0.0` 标签，再在 JitPack 查看构建结果。依赖版本必须对应真实的标签或提交；文档中的版本并不表示已经发布。
-- 新增或变更 API 时更新 API 版本和发布标签。本体内部更新且 API 契约不变时，不需要修改本仓库或让调用插件升级依赖。
-- 正式发布后不要移动已有标签或用同一版本覆盖不同的 API。开发期间优先本地联调，验证后再发布固定标签。
-- 当前仅准备了发布配置，未执行 Maven、SDKMAN 或 JitPack 构建，JitPack 的 JDK 下载及完整构建仍需发布时验证。
-
-ActionMenu 本体使用普通编译依赖并 Shade 此 API；调用插件使用 provided 依赖。API 包名始终为 `io.mczju.actionmenu.api`，不能 relocate，也不能由调用插件重复打包。
+API 主插件版本独立，服务能力为查询、创建、批量修改、启停和打开菜单。目前不提供删除和次数重置。
 
 ## 调用插件的依赖
 
-调用插件自己的 POM 添加 JitPack 仓库：
+以 Maven 构建为例，调用插件自己的 POM 添加 JitPack 仓库：
 
 ```xml
 <repositories>
@@ -41,9 +28,7 @@ ActionMenu 本体使用普通编译依赖并 Shade 此 API；调用插件使用 
 </dependency>
 ```
 
-首次发布前，可以先将本项目安装到本机 Maven 仓库，再使用相同坐标开发。调用插件仍需声明自身使用的 Paper API 依赖。不要将 actionmenu-api 再次 Shade 到调用插件，不要复制 API 源码；运行时统一使用 ActionMenu 插件提供的接口类。
-
-使用传统 plugin.yml 的调用插件添加：
+使用 plugin.yml 的调用插件添加：
 
 ```yaml
 depend: [ActionMenu]
@@ -59,8 +44,6 @@ dependencies:
       required: true
       join-classpath: true
 ```
-
-两种插件描述文件按调用插件实际使用的格式选择，不必同时添加。
 
 ## 获取服务
 
@@ -79,7 +62,7 @@ if (api == null) {
 
 ActionMenu 完成初始化后注册服务，在停用时先使旧服务引用失效，再注销服务和保存数据。调用插件不应在自身停用后继续使用服务。
 
-## 首批能力与约定
+## 能力与约定
 
 | 方法 | 含义 |
 | --- | --- |
